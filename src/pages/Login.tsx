@@ -43,7 +43,12 @@ export const Login = () => {
     } catch (error: any) {
       console.error(error);
       if (error.code === 'auth/unauthorized-domain') {
-        toast.error('Domain not authorized. Please add this domain to Firebase Console > Authentication > Settings > Authorized Domains.');
+        const domain = window.location.hostname;
+        toast.error(`Domain not authorized. Please add "${domain}" to Firebase Console > Authentication > Settings > Authorized Domains.`);
+      } else if (error.code === 'auth/popup-blocked') {
+        toast.error('Popup blocked. Please allow popups for this site.');
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        toast.error('Login cancelled. You closed the popup.');
       } else {
         toast.error(error.message || 'Failed to login with Google');
       }
@@ -161,6 +166,14 @@ export const Login = () => {
           <p>Please <strong>Register</strong> first with these emails to test roles:</p>
           <p className="mt-1">User: user@example.com / password123</p>
           <p>Admin: admin@example.com / password123</p>
+        </div>
+
+        <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-xs text-yellow-800">
+          <p className="font-semibold mb-1">Troubleshooting Google Login:</p>
+          <p>If you see an "Unauthorized Domain" error, you must add this domain to Firebase Console:</p>
+          <code className="block mt-2 p-2 bg-white rounded border border-yellow-300 font-mono select-all">
+            {window.location.hostname}
+          </code>
         </div>
       </div>
 
