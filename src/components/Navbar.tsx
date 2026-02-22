@@ -28,13 +28,13 @@ export const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center gap-2">
+            <Link to="/" className="flex-shrink-0 flex items-center gap-3">
               <img 
                 src={logoUrl} 
                 alt="Maha Kitchen" 
-                className="h-10 w-auto object-contain" 
+                className="h-14 w-auto object-contain" 
               />
-              <span className="font-bold text-xl text-gray-900">Maha Kitchen</span>
+              <span className="font-bold text-2xl md:text-3xl text-gray-900 tracking-tight">Maha Kitchen</span>
             </Link>
           </div>
 
@@ -92,7 +92,15 @@ export const Navbar = () => {
             )}
           </div>
 
-          <div className="flex items-center md:hidden">
+          <div className="flex items-center gap-4 md:hidden">
+            <Link to="/cart" className="relative p-1 text-gray-600 hover:text-orange-500">
+              <ShoppingCart className="h-6 w-6" />
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-1.5 py-0.5 text-xs font-bold leading-none text-white bg-orange-500 rounded-full">
+                  {itemCount}
+                </span>
+              )}
+            </Link>
             <button
               onClick={() => setIsMenuOpen(true)}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-orange-500 focus:outline-none"
