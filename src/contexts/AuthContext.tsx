@@ -8,7 +8,8 @@ import {
   updateProfile,
   GoogleAuthProvider,
   signInWithPopup,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  fetchSignInMethodsForEmail
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
@@ -23,6 +24,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  checkUserMethods: (email: string) => Promise<string[]>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -160,8 +162,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await sendPasswordResetEmail(auth, email);
   };
 
+  const checkUserMethods = async (email: string) => {
+    if (!auth) throw new Error("Firebase not configured");
+    return await fetchSignInMethodsForEmail(auth, email);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, isAdmin, login, register, logout, loginWithGoogle, resetPassword }}>
+    <AuthContext.Provider value={{ user, loading, isAdmin, login, register, logout, loginWithGoogle, resetPassword, checkUserMethods }}>
       {!loading && children}
     </AuthContext.Provider>
   );

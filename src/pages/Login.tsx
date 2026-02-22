@@ -8,7 +8,7 @@ export const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login, loginWithGoogle, resetPassword } = useAuth();
+  const { login, loginWithGoogle, resetPassword, checkUserMethods } = useAuth();
   const navigate = useNavigate();
   
   // Forgot Password State
@@ -63,6 +63,21 @@ export const Login = () => {
     }
     setResetLoading(true);
     try {
+      // Check if user exists and what methods they use
+      const methods = await checkUserMethods(resetEmail);
+      
+      if (methods.length === 0) {
+        toast.error('No account found with this email. Please Sign Up.');
+        setResetLoading(false);
+        return;
+      }
+
+      if (methods.includes('google.com') && !methods.includes('password')) {
+        toast.error('You signed up with Google. Please use "Continue with Google" to login.');
+        setResetLoading(false);
+        return;
+      }
+
       await resetPassword(resetEmail);
       toast.success('Reset link sent! Please check your inbox and spam folder.');
       setShowForgotPassword(false);
