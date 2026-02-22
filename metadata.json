@@ -1,0 +1,5 @@
+{
+  "name": "Maha Kitchen",
+  "description": "A full-stack food delivery application with real-time tracking, user dashboard, and admin controls using Firebase.",
+  "requestFramePermissions": []
+}
