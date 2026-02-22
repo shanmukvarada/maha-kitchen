@@ -42,7 +42,11 @@ export const Login = () => {
       navigate('/');
     } catch (error: any) {
       console.error(error);
-      toast.error(error.message || 'Failed to login with Google');
+      if (error.code === 'auth/unauthorized-domain') {
+        toast.error('Domain not authorized. Please add this domain to Firebase Console > Authentication > Settings > Authorized Domains.');
+      } else {
+        toast.error(error.message || 'Failed to login with Google');
+      }
     }
   };
 
