@@ -64,12 +64,18 @@ export const Login = () => {
     setResetLoading(true);
     try {
       await resetPassword(resetEmail);
-      toast.success('Check your email for the reset link!');
+      toast.success('Reset link sent! Please check your inbox and spam folder.');
       setShowForgotPassword(false);
       setResetEmail('');
     } catch (error: any) {
-      console.error(error);
-      toast.error(error.message || 'Failed to send reset email');
+      console.error("Reset password error:", error);
+      if (error.code === 'auth/user-not-found') {
+        toast.error('No account found with this email.');
+      } else if (error.code === 'auth/invalid-email') {
+        toast.error('Invalid email address.');
+      } else {
+        toast.error('Failed to send reset email. Please try again later.');
+      }
     } finally {
       setResetLoading(false);
     }
@@ -188,7 +194,10 @@ export const Login = () => {
               <X className="h-6 w-6" />
             </button>
             <h3 className="text-xl font-bold text-gray-900 mb-2">Reset Password</h3>
-            <p className="text-gray-600 mb-6">Enter your email address and we'll send you a link to reset your password.</p>
+            <p className="text-gray-600 mb-4">Enter your email address and we'll send you a link to reset your password.</p>
+            <div className="bg-blue-50 p-3 rounded-lg mb-4 text-sm text-blue-800">
+              <p><strong>Note:</strong> If you don't see the email in your inbox, please check your <strong>Spam</strong> or <strong>Junk</strong> folder.</p>
+            </div>
             
             <form onSubmit={handleForgotPassword}>
               <div className="mb-4">
