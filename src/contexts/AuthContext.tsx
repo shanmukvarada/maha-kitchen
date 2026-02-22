@@ -5,7 +5,10 @@ import {
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
   signOut, 
-  updateProfile 
+  updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
+  sendPasswordResetEmail
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
@@ -18,6 +21,8 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -126,8 +131,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await signOut(auth);
   };
 
+  const loginWithGoogle = async () => {
+    if (!auth || !db) throw new Error("Firebase not configured");
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    // Check if user doc exists, if not create it
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    if (!userDoc.exists()) {
+      await setDoc(userDocRef, {
+        email: user.email,
+        displayName: user.displayName,
+        role: 'user',
+        createdAt: new Date(),
+        profileCompleted: false
+      });
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    if (!auth) throw new Error("Firebase not configured");
+    await sendPasswordResetEmail(auth, email);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, isAdmin, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, isAdmin, login, register, logout, loginWithGoogle, resetPassword }}>
       {!loading && children}
     </AuthContext.Provider>
   );
